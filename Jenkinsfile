@@ -1,5 +1,8 @@
 pipeline {
-  agent { 'docker' }
+  agent {
+    // ジョブ実行先
+    label 'docker'
+  }
   stages {
     stage('SCM') {
       steps {
