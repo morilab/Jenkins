@@ -1,4 +1,5 @@
 // ----------------------------
+<<<<<<< HEAD
 // Declarative Pipeline�L�@
 // ----------------------------
 pipeline {
@@ -43,6 +44,19 @@ pipeline {
                 credentialsId:''
             ],
             poll: true
+=======
+// Declarative Pipeline記法 
+// ----------------------------
+pipeline {
+  agent {
+    // ジョブ実行先
+    label 'docker'
+  }
+  stages {
+    stage('SCM') {
+      steps {
+        sh 'pwd'
+>>>>>>> 83191a669ebdfe548b5b32c95ff3201ee9207d5e
         sh 'ls -laF'
       }
     }
