@@ -1,31 +1,50 @@
+// ----------------------------
+// Declarative Pipeline記法
+// ----------------------------
 pipeline {
-    agent {
-        label 'docker'
+  //---------------------------
+  // エージェント
+  //---------------------------
+  agent {
+    // ジョブ実行先を絞る場合に記載
+    label 'docker'
+  }
+  
+  //---------------------------
+  // ビルドトリガ
+  //---------------------------
+  triggers {
+    pollSCM('*/1 9-23 * * 1-5') // SCMポーリング周期(1分毎、9:00～23:00、月～金)
+  }
+  
+  //---------------------------
+  // 変数定義
+  //---------------------------
+  environment {
+    BRANCH = 'master'
+  }
+  
+  //---------------------------
+  // ビルドトリガ
+  //---------------------------
+  stages {
+    stage('Git CheckOut') {
+      steps {
+        git url: 'https://github.com/morilab/Jenkins_covered_plugin.git'
+        sh 'ls -laF'
+      }
     }
-    
-    stages {
-        stage('docker-build') {
-            steps {
-                sh 'docker build -t acu-m0:lint .'
-            }
-        }
-        stage('lint') {
-            environment {
-                PID = powershell(
-                    returnStdout: true,
-                    script: 'docker run -itd acu-m0:lint /bin/sh'
-                ).trim()
-            }
-            steps {
-                sh 'docker exec $PID csh lint.sh'
-                sh 'docker cp ${PID}:/home/genetec/vlog_lint.xml vlog_lint.xml'
-                junit 'vlog_lint.xml'
-            }
-        }
-        stage('compile') {
-            steps {
-                echo "Compile"
-            }
-        }
+    stage('Mercurial CheckOut') {
+      steps {
+        checkout scm: [
+                $class:'MercurialSCM',
+                source:'http://dmori@5f-netbsd/kallithea/project/NFT/ACU_M0/ACU_M0_verification',
+                clean:false,
+                credentialsId:''
+            ],
+            poll: true
+        sh 'ls -laF'
+      }
     }
+  }
 }
